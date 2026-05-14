@@ -1,23 +1,40 @@
-// Replace with YOUR deployed Apps Script Web App URL
+// HomeServe API — Fixed for CORS
 var API_URL = "https://script.google.com/macros/s/AKfycbyQ8CFYtDYPv3oHRI9h-SpywDlzUkbcc7XuZNV7EySTUt6_16WCkL1KAbYbM80rIv8Dfg/exec";
 
 function apiGet(action, cb) {
-  var url = API_URL + "?action=" + action;
-  fetch(url)
-    .then(r => r.json())
-    .then(d => cb(null, d.data || []))
-    .catch(e => cb(e, []));
+  fetch(API_URL + "?action=" + action, {
+    method: "GET",
+    redirect: "follow"
+  })
+  .then(function(r){ return r.text(); })
+  .then(function(text){
+    try {
+      var d = JSON.parse(text);
+      cb(null, d.data || []);
+    } catch(e) {
+      cb("Parse error: " + text.substring(0,100), []);
+    }
+  })
+  .catch(function(e){ cb(e.toString(), []); });
 }
 
 function apiPost(body, cb) {
   fetch(API_URL, {
     method: "POST",
-    headers: {"Content-Type":"application/json"},
+    redirect: "follow",
+    headers: {"Content-Type": "text/plain"},
     body: JSON.stringify(body)
   })
-  .then(r => r.json())
-  .then(d => cb(null, d))
-  .catch(e => cb(e, {}));
+  .then(function(r){ return r.text(); })
+  .then(function(text){
+    try {
+      var d = JSON.parse(text);
+      cb(null, d);
+    } catch(e) {
+      cb("Parse error: " + text.substring(0,100), {});
+    }
+  })
+  .catch(function(e){ cb(e.toString(), {}); });
 }
 
 function badge(status) {
@@ -32,10 +49,10 @@ function badge(status) {
 
 function showMsg(id, text, isErr) {
   var el = document.getElementById(id);
-  if (el) { el.innerHTML = "<div class='"+(isErr?"err":"msg")+"'>"+text+"</div>"; }
+  if (el) el.innerHTML = "<div class='"+(isErr?"err":"msg")+"'>"+text+"</div>";
 }
 
 function loading(id, text) {
   var el = document.getElementById(id);
-  if (el) { el.innerHTML = "<div style='color:#999;padding:12px'><span class='spinner'></span>"+(text||"Loading...")+"</div>"; }
+  if (el) el.innerHTML = "<div style='color:#999;padding:12px'><span class='spinner'></span>"+(text||"Loading from Google Sheets...")+"</div>";
 }
