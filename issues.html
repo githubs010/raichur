@@ -1,0 +1,71 @@
+<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>Issues | HomeServe</title><link rel='stylesheet' href='style.css'></head><body><header class='top'><div class='wrap nav'>
+<a href='index.html' class='brand'>🏠 HomeServe</a>
+<nav class='links'>
+  <a href='index.html' >Home</a>
+  <a href='user.html' >My Bookings</a>
+  <a href='book.html' >Book</a>
+  <a href='issues.html' class="active">Issues</a>
+  <a href='provider.html' >Provider</a>
+  <a href='admin.html' >Admin</a>
+</nav>
+<a href='book.html' class='btn p'>Book Now</a>
+</div></header>
+<main class='wrap'><section class='grid2'>
+  <div class='card'>
+    <h1>Raise an Issue</h1>
+    <p class='sub'>Submit a complaint. Admin will assign it to a provider or resolve directly.</p>
+    <div class='form-grid' style='margin-top:16px'>
+      <label>Booking ID<input id='iBookingId' placeholder='e.g. BK-1001' required></label>
+      <label>Your Name<input id='iName' placeholder='Full name' required></label>
+      <label>Priority<select id='iPri'><option>Low</option><option>Medium</option><option selected>High</option></select></label>
+      <label>Category
+        <select id='iCat'>
+          <option>Provider late</option><option>Work quality issue</option>
+          <option>Overcharged</option><option>Provider misbehaved</option><option>Other</option>
+        </select>
+      </label>
+      <label style='grid-column:1/-1'>Describe the Issue<textarea id='iDesc' placeholder='Be specific about what went wrong.' required></textarea></label>
+      <div style='grid-column:1/-1'><button class='btn p' onclick='submitIssue()'>Submit Issue</button></div>
+    </div>
+    <div id='issueMsg'></div>
+  </div>
+  <div class='card'>
+    <h2>All Issues</h2>
+    <button class='btn' onclick='loadIssues()' style='margin-bottom:12px'>🔄 Refresh</button>
+    <div id='issuesList'></div>
+  </div>
+</section></main>
+<footer class='wrap'><p>🏠 HomeServe — Excel + Google Apps Script powered platform.</p></footer>
+<script src='api.js'></script>
+<script>
+function submitIssue(){
+  var bid=document.getElementById('iBookingId').value.trim();
+  var name=document.getElementById('iName').value.trim();
+  var desc=document.getElementById('iDesc').value.trim();
+  if(!bid||!name||!desc){showMsg('issueMsg','Please fill all fields.',true);return;}
+  showMsg('issueMsg','<span class="spinner"></span> Saving to Google Sheets...',false);
+  apiPost({
+    action:'addIssue', bookingId:bid, customer:name,
+    description:desc+'  [Category: '+document.getElementById('iCat').value+']',
+    priority:document.getElementById('iPri').value
+  }, function(err,res){
+    if(err||res.status==='error'){showMsg('issueMsg','Error: '+(res&&res.message||err),true);return;}
+    showMsg('issueMsg','✓ '+res.message+' Issue ID: <strong>'+res.issueId+'</strong>',false);
+    loadIssues();
+  });
+}
+function loadIssues(){
+  loading('issuesList','Loading issues...');
+  apiGet('getIssues', function(err, data){
+    if(err||!data.length){document.getElementById('issuesList').innerHTML='<p>No issues found or unable to connect.</p>';return;}
+    document.getElementById('issuesList').innerHTML = data.reverse().map(i=>
+      '<div class="mini"><div style="display:flex;justify-content:space-between;align-items:center"><strong>'+i['Issue ID']+'</strong>'+badge(i['Status'])+'</div>'
+      +'<div style="font-size:12px;margin:4px 0;color:#6f6c65">'+i['Booking ID']+' | '+i['Customer']+' | '+badge(i['Priority'])+'</div>'
+      +'<p style="margin:4px 0;font-size:13px">'+i['Description']+'</p>'
+      +'<div style="font-size:12px;color:#437a22;margin-top:4px">Resolution: '+i['Resolution']+'</div></div>'
+    ).join('');
+  });
+}
+window.onload = loadIssues;
+</script></body></html>

@@ -1,0 +1,14 @@
+QUICK SETUP CHECKLIST
+=====================
+[ ] 1. Create new Google Sheet
+[ ] 2. Copy Sheet ID from URL
+[ ] 3. Open Extensions → Apps Script in the Sheet
+[ ] 4. Paste Code.gs content
+[ ] 5. Replace YOUR_SPREADSHEET_ID with your Sheet ID
+[ ] 6. Run setupSheets() function once
+[ ] 7. Deploy as Web App (Anyone access)
+[ ] 8. Copy the Web App URL
+[ ] 9. Open api.js → paste Web App URL
+[ ] 10. Upload all HTML/CSS/JS files to GitHub
+[ ] 11. Enable GitHub Pages in repo Settings
+[ ] 12. Done! Share your live URL

@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>My Bookings | HomeServe</title><link rel='stylesheet' href='style.css'></head><body><header class='top'><div class='wrap nav'>
+<a href='index.html' class='brand'>🏠 HomeServe</a>
+<nav class='links'>
+  <a href='index.html' >Home</a>
+  <a href='user.html' class="active">My Bookings</a>
+  <a href='book.html' >Book</a>
+  <a href='issues.html' >Issues</a>
+  <a href='provider.html' >Provider</a>
+  <a href='admin.html' >Admin</a>
+</nav>
+<a href='book.html' class='btn p'>Book Now</a>
+</div></header>
+<main class='wrap'><section>
+  <h1>👤 User Panel — My Bookings</h1>
+  <p class='sub'>View all your bookings, track status, and raise issues directly from here.</p>
+  <div class='search-row'>
+    <input id='searchPhone' placeholder='Search by phone or name...' style='max-width:300px'>
+    <button class='btn p' onclick='loadUserBookings()'>🔍 Search</button>
+    <button class='btn' onclick='loadUserBookings(true)'>Show All</button>
+    <a href='book.html' class='btn p'>+ New Booking</a>
+  </div>
+  <div id='userBookings'></div>
+</section></main>
+<footer class='wrap'><p>🏠 HomeServe — Excel + Google Apps Script powered platform.</p></footer>
+<script src='api.js'></script>
+<script>
+function loadUserBookings(all){
+  loading('userBookings','Loading from Google Sheets...');
+  var q = document.getElementById('searchPhone').value.trim().toLowerCase();
+  apiGet('getBookings', function(err, data){
+    if(err){document.getElementById('userBookings').innerHTML='<div class="err">Cannot connect. Check your API URL in api.js.</div>';return;}
+    var filtered = all || !q ? data : data.filter(b=>(b['Customer Name']||'').toLowerCase().includes(q)||(b['Phone']||'').includes(q));
+    if(!filtered.length){document.getElementById('userBookings').innerHTML='<div class="note">No bookings found.</div>';return;}
+    document.getElementById('userBookings').innerHTML = '<div style="overflow:auto"><table><thead><tr><th>ID</th><th>Name</th><th>Service</th><th>Date</th><th>Slot</th><th>Provider</th><th>Status</th><th>Amount</th><th>Action</th></tr></thead><tbody>'
+    + filtered.reverse().map(b=>'<tr><td><strong>'+b['Booking ID']+'</strong></td><td>'+b['Customer Name']+'</td><td>'+b['Service']+'</td><td>'+b['Date']+'</td><td>'+b['Time Slot']+'</td><td>'+(b['Provider']||'—')+'</td><td>'+badge(b['Status'])+'</td><td>₹'+b['Amount']+'</td><td><a href="issues.html" class="btn sm">🚩 Issue</a></td></tr>').join('')
+    + '</tbody></table></div>';
+  });
+}
+window.onload = function(){ loadUserBookings(true); };
+</script></body></html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>Book Service | HomeServe</title><link rel='stylesheet' href='style.css'></head><body><header class='top'><div class='wrap nav'>
+<a href='index.html' class='brand'>🏠 HomeServe</a>
+<nav class='links'>
+  <a href='index.html' >Home</a>
+  <a href='user.html' >My Bookings</a>
+  <a href='book.html' class="active">Book</a>
+  <a href='issues.html' >Issues</a>
+  <a href='provider.html' >Provider</a>
+  <a href='admin.html' >Admin</a>
+</nav>
+<a href='book.html' class='btn p'>Book Now</a>
+</div></header>
+<main class='wrap'><section class='grid2'>
+  <div class='card'>
+    <h1>Book a Service</h1>
+    <p class='sub'>Your booking is saved directly to Google Sheets.</p>
+    <div class='form-grid' style='margin-top:18px'>
+      <label>Full Name<input id='bName' placeholder='e.g. Ravi Kumar' required></label>
+      <label>Phone<input id='bPhone' placeholder='10-digit mobile' required></label>
+      <label>Service
+        <select id='bService'>
+          <option>Home Cleaning</option><option>Plumbing</option><option>Electrical</option>
+          <option>Carpentry</option><option>AC Service</option><option>Pest Control</option>
+          <option>Painting</option><option>Water Tank Cleaning</option>
+        </select>
+      </label>
+      <label>Date<input type='date' id='bDate' required></label>
+      <label>Time Slot
+        <select id='bSlot'>
+          <option>09:00 AM - 11:00 AM</option><option>11:00 AM - 01:00 PM</option>
+          <option>02:00 PM - 04:00 PM</option><option>04:00 PM - 06:00 PM</option>
+        </select>
+      </label>
+      <label>Payment<select id='bPay'><option>UPI</option><option>Cash after service</option></select></label>
+      <label style='grid-column:1/-1'>Address<input id='bAddr' placeholder='Flat no, street, area, city' required></label>
+      <label style='grid-column:1/-1'>Estimated Amount (₹)<input type='number' id='bAmt' value='500'></label>
+      <label style='grid-column:1/-1'>Describe Issue<textarea id='bNotes' placeholder='What needs to be done?'></textarea></label>
+      <div style='grid-column:1/-1'>
+        <button class='btn p' onclick='submitBooking()'>✓ Confirm Booking</button>
+      </div>
+    </div>
+    <div id='bookMsg'></div>
+  </div>
+  <div>
+    <div class='card'>
+      <h2>How it works</h2>
+      <ol style='padding-left:18px;display:grid;gap:12px;margin-top:8px;color:#6f6c65;font-size:14px'>
+        <li>Fill form and submit.</li>
+        <li>Data saves to Google Sheets instantly.</li>
+        <li>Admin assigns best provider.</li>
+        <li>Provider arrives and completes work.</li>
+        <li>You pay and rate the service.</li>
+      </ol>
+      <div class='note' style='margin-top:14px'>📊 Booking is saved in Google Sheets. Admin can see it immediately.</div>
+    </div>
+  </div>
+</section></main>
+<footer class='wrap'><p>🏠 HomeServe — Excel + Google Apps Script powered platform.</p></footer>
+<script src='api.js'></script>
+<script>
+function submitBooking(){
+  var name=document.getElementById('bName').value.trim();
+  var phone=document.getElementById('bPhone').value.trim();
+  var addr=document.getElementById('bAddr').value.trim();
+  if(!name||!phone||!addr){showMsg('bookMsg','Please fill all required fields.',true);return;}
+  showMsg('bookMsg','<span class="spinner"></span> Saving to Google Sheets...',false);
+  apiPost({
+    action:'addBooking',
+    name:name, phone:phone,
+    service:document.getElementById('bService').value,
+    date:document.getElementById('bDate').value,
+    slot:document.getElementById('bSlot').value,
+    address:addr,
+    payment:document.getElementById('bPay').value,
+    amount:document.getElementById('bAmt').value,
+    notes:document.getElementById('bNotes').value
+  }, function(err, res){
+    if(err||res.status==='error'){showMsg('bookMsg','Error: '+(res&&res.message||err),true);return;}
+    showMsg('bookMsg','✓ '+res.message+' Booking ID: <strong>'+res.bookingId+'</strong> — <a href="user.html">View in My Bookings →</a>',false);
+  });
+}
+</script></body></html>
