@@ -1,5 +1,5 @@
 // Replace with YOUR deployed Apps Script Web App URL
-var API_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+var API_URL = "https://script.google.com/macros/s/AKfycbyQ8CFYtDYPv3oHRI9h-SpywDlzUkbcc7XuZNV7EySTUt6_16WCkL1KAbYbM80rIv8Dfg/exec";
 
 function apiGet(action, cb) {
   var url = API_URL + "?action=" + action;
