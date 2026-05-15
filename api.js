@@ -1,5 +1,5 @@
 // HomeServe API — Fixed for CORS
-var API_URL = "https://script.google.com/macros/s/AKfycbw8z-NMgF0XoU5IHLCr5b7HPX01PEBZy22c8Km-acj4b70G067rE26FVCmbhjfaifuBVA/exec";
+var API_URL = "https://script.google.com/macros/s/AKfycbx-NEBGK3o2bbfZDoM8AdnCfZej6rFNXPaItzwVX1qS09OswyCGYhXtN5hUs35fWc7vDg/exec";
 
 function apiGet(action, cb) {
   fetch(API_URL + "?action=" + action, {
